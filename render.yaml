@@ -1,0 +1,38 @@
+
+services:
+  # FastAPI backend
+  - type: web
+    name: rag-research-api
+    runtime: python
+    plan: free
+    region: singapore
+    branch: main
+    buildCommand: pip install -r backend_requirements.txt
+    startCommand: uvicorn backend.api:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.11
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
+      - key: UPLOAD_DIR
+        value: data/uploads
+      - key: CHROMA_DIR
+        value: chroma_db
+
+  # Streamlit frontend
+  - type: web
+    name: rag-research-frontend
+    runtime: python
+    plan: free
+    region: singapore
+    branch: main
+    buildCommand: pip install -r requirements.txt
+    startCommand: streamlit run app.py --server.address 0.0.0.0 --server.port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.11
+      - key: API_BASE_URL
+        value: https://replace-with-your-backend-url.onrender.com
